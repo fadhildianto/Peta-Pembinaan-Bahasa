@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreKegiatanRequest;
+use App\Http\Requests\UpdateKegiatanRequest;
 use App\Models\Kegiatan;
 use App\Models\Lokasi;
-use App\Models\Peserta;
-use App\Models\Arsip;
-use Illuminate\Http\Request;
 
 class KegiatanController extends Controller
 {
@@ -23,79 +22,43 @@ class KegiatanController extends Controller
         return view('admin.kegiatan.create', compact('lokasi'));
     }
 
-    public function store(Request $request)
+    public function store(StoreKegiatanRequest $request)
     {
-        $kegiatan = Kegiatan::create([
-            'nama_kegiatan' => $request->nama_kegiatan,
-            'jenis_kegiatan' => $request->jenis_kegiatan,
-            'tahun' => $request->tahun,
-            'lokasi_id' => $request->lokasi_id,
-            'deskripsi' => $request->deskripsi,
-        ]);
-
-        if ($request->peserta_nama) {
-            foreach ($request->peserta_nama as $i => $nama) {
-                Peserta::create([
-                    'kegiatan_id' => $kegiatan->id,
-                    'nama' => $nama,
-                    'instansi' => $request->peserta_instansi[$i],
-                ]);
-            }
-        }
-
-        if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
-                $path = $file->store('arsip', 'public');
-
-                Arsip::create([
-                    'kegiatan_id' => $kegiatan->id,
-                    'nama_file' => $file->getClientOriginalName(),
-                    'path_file' => $path,
-                ]);
-            }
-        }
+        Kegiatan::create(array_merge(
+            $request->validated(),
+            ['created_by' => auth()->id()]
+        ));
 
         return redirect()->route('admin.kegiatan.index')
-            ->with('success', 'Data berhasil ditambahkan');
+            ->with('success', 'Kegiatan berhasil ditambahkan');
     }
 
-    public function show($id)
+    public function show(Kegiatan $kegiatan)
     {
-        $kegiatan = Kegiatan::with(['lokasi', 'peserta', 'arsip'])
-            ->findOrFail($id);
-
+        $kegiatan->load(['lokasi', 'peserta', 'arsip']);
         return view('admin.kegiatan.show', compact('kegiatan'));
     }
 
-    public function edit($id)
+    public function edit(Kegiatan $kegiatan)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
         $lokasi = Lokasi::all();
-
         return view('admin.kegiatan.edit', compact('kegiatan', 'lokasi'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateKegiatanRequest $request, Kegiatan $kegiatan)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
+        $kegiatan->update($request->validated());
 
-        $kegiatan->update([
-            'nama_kegiatan' => $request->nama_kegiatan,
-            'jenis_kegiatan' => $request->jenis_kegiatan,
-            'tahun' => $request->tahun,
-            'lokasi_id' => $request->lokasi_id,
-            'deskripsi' => $request->deskripsi,
-        ]);
-
-        return redirect()->route('kegiatan.index')->with('success', 'Data berhasil diupdate');
+        return redirect()->route('admin.kegiatan.index')
+            ->with('success', 'Kegiatan berhasil diperbarui');
     }
 
-    public function destroy($id)
+    public function destroy(Kegiatan $kegiatan)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
         $kegiatan->delete();
 
-        return redirect()->route('kegiatan.index')->with('success', 'Data berhasil dihapus');
+        return redirect()->route('admin.kegiatan.index')
+            ->with('success', 'Kegiatan berhasil dihapus');
     }
 }
 

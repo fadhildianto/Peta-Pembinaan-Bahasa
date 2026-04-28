@@ -1,16 +1,18 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreLokasiRequest;
+use App\Http\Requests\UpdateLokasiRequest;
 use App\Models\Lokasi;
-use Illuminate\Http\Request;
 
 class LokasiController extends Controller
 {
     public function index()
     {
-        $lokasi = Lokasi::latest()->get();
-        return view('admin.lokasi.index', compact('lokasi'));
+        $lokasis = Lokasi::withCount('kegiatans')->latest()->get();
+        return view('admin.lokasi.index', compact('lokasis'));
     }
 
     public function create()
@@ -18,44 +20,38 @@ class LokasiController extends Controller
         return view('admin.lokasi.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreLokasiRequest $request)
     {
-        $request->validate([
-            'nama_kabupaten' => 'required|string|max:255',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-        ]);
+        Lokasi::create($request->validated());
 
-        Lokasi::create($request->all());
-
-        return redirect()->route('lokasi.index')->with('success', 'Data berhasil ditambahkan');
+        return redirect()->route('admin.lokasi.index')
+            ->with('success', 'Lokasi berhasil ditambahkan');
     }
 
-    public function edit($id)
+    public function edit(Lokasi $lokasi)
     {
-        $lokasi = Lokasi::findOrFail($id);
         return view('admin.lokasi.edit', compact('lokasi'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateLokasiRequest $request, Lokasi $lokasi)
     {
-        $request->validate([
-            'nama_kabupaten' => 'required|string|max:255',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-        ]);
+        $lokasi->update($request->validated());
 
-        $lokasi = Lokasi::findOrFail($id);
-        $lokasi->update($request->all());
-
-        return redirect()->route('lokasi.index')->with('success', 'Data berhasil diupdate');
+        return redirect()->route('admin.lokasi.index')
+            ->with('success', 'Lokasi berhasil diperbarui');
     }
 
-    public function destroy($id)
+    public function destroy(Lokasi $lokasi)
     {
-        $lokasi = Lokasi::findOrFail($id);
+        // Check if lokasi has kegiatans
+        if ($lokasi->kegiatans()->count() > 0) {
+            return redirect()->route('admin.lokasi.index')
+                ->with('error', 'Tidak bisa menghapus lokasi yang masih memiliki kegiatan');
+        }
+
         $lokasi->delete();
 
-        return redirect()->route('lokasi.index')->with('success', 'Data berhasil dihapus');
+        return redirect()->route('admin.lokasi.index')
+            ->with('success', 'Lokasi berhasil dihapus');
     }
 }
