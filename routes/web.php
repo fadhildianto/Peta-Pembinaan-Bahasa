@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\KegiatanController;
 use App\Http\Controllers\Admin\LokasiController;
 use App\Http\Controllers\Admin\PesertaController;
 use App\Http\Controllers\Admin\ArsipController;
+use App\Http\Controllers\Admin\PetaController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -20,5 +21,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('lokasi', LokasiController::class);
     Route::resource('peserta', PesertaController::class);
     Route::resource('arsip', ArsipController::class);
+
+    // Peta
+    Route::get('/peta', [PetaController::class, 'index'])->name('peta.index');
+    Route::get('/peta/{lokasi}', [PetaController::class, 'show'])->name('peta.show');
+
+    // API Endpoints untuk Peta
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::get('/map-data', [PetaController::class, 'getMapData'])->name('map-data');
+        Route::get('/kegiatan-by-lokasi/{lokasiId}', [PetaController::class, 'getKegiatanByLokasi'])->name('kegiatan-by-lokasi');
+    });
 });
 

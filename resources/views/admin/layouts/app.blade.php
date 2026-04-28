@@ -138,6 +138,9 @@
     <a href="{{ route('admin.arsip.index') }}" class="@if(Route::is('admin.arsip.*')) active @endif">
         <i class="bi bi-file-earmark"></i> Arsip
     </a>
+    <a href="{{ route('admin.peta.index') }}" class="@if(Route::is('admin.peta.*')) active @endif">
+        <i class="bi bi-map"></i> Peta
+    </a>
 
     <hr style="border-color: #334155; margin: 20px 0;">
 

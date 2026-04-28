@@ -1,0 +1,142 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Lokasi;
+use App\Models\Kegiatan;
+
+class PetaController extends Controller
+{
+    /**
+     * Display the map view
+     */
+    public function index()
+    {
+        // Info Balai Bahasa Provinsi Riau
+        $infoBalai = [
+            'nama' => 'Balai Bahasa Provinsi Riau',
+            'alamat' => 'Jl. Sudirman No. 123, Pekanbaru, Riau',
+            'no_telp' => '(0761) 123456',
+            'email' => 'info@balaibahasariau.go.id',
+            'website' => 'www.balaibahasariau.go.id',
+            'latitude' => 0.5431,
+            'longitude' => 101.4477,
+        ];
+
+        return view('admin.peta.index', compact('infoBalai'));
+    }
+
+    /**
+     * Get all locations with kegiatan count (API)
+     */
+    public function getMapData()
+    {
+        $lokasis = Lokasi::with('kegiatans')
+            ->get()
+            ->map(function ($lokasi) {
+                return [
+                    'id' => $lokasi->id,
+                    'nama' => $lokasi->nama_kabupaten,
+                    'latitude' => (float) $lokasi->latitude,
+                    'longitude' => (float) $lokasi->longitude,
+                    'deskripsi' => $lokasi->deskripsi ?? 'Lokasi di ' . $lokasi->nama_kabupaten,
+                    'zoom_level' => $lokasi->zoom_level,
+                    'kegiatan_count' => $lokasi->kegiatans()->count(),
+                    'peserta_count' => $lokasi->kegiatans()
+                        ->withCount('peserta')
+                        ->get()
+                        ->sum('peserta_count'),
+                    'arsip_count' => $lokasi->kegiatans()
+                        ->withCount('arsip')
+                        ->get()
+                        ->sum('arsip_count'),
+                    'detail_url' => route('admin.peta.show', $lokasi->id),
+                ];
+            });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $lokasis,
+        ]);
+    }
+
+    /**
+     * Get kegiatans by lokasi (API)
+     */
+    public function getKegiatanByLokasi($lokasiId)
+    {
+        $lokasi = Lokasi::findOrFail($lokasiId);
+        $kegiatans = $lokasi->kegiatans()
+            ->with('peserta', 'arsip')
+            ->get()
+            ->map(function ($kegiatan) {
+                return [
+                    'id' => $kegiatan->id,
+                    'nama' => $kegiatan->nama_kegiatan,
+                    'jenis' => $kegiatan->jenis_kegiatan,
+                    'tahun' => $kegiatan->tahun,
+                    'tanggal_mulai' => $kegiatan->tanggal_mulai?->format('d M Y'),
+                    'tanggal_selesai' => $kegiatan->tanggal_selesai?->format('d M Y'),
+                    'deskripsi' => $kegiatan->deskripsi,
+                    'peserta_count' => $kegiatan->peserta()->count(),
+                    'arsip_count' => $kegiatan->arsip()->count(),
+                    'detail_url' => route('admin.kegiatan.show', $kegiatan->id),
+                ];
+            });
+
+        return response()->json([
+            'status' => 'success',
+            'lokasi' => [
+                'id' => $lokasi->id,
+                'nama' => $lokasi->nama_kabupaten,
+                'latitude' => (float) $lokasi->latitude,
+                'longitude' => (float) $lokasi->longitude,
+            ],
+            'kegiatans' => $kegiatans,
+        ]);
+    }
+
+    /**
+     * Show detail lengkap lokasi
+     */
+    public function show(Lokasi $lokasi)
+    {
+        $lokasi->load('kegiatans.peserta', 'kegiatans.arsip');
+
+        // Get statistics
+        $totalKegiatan = $lokasi->kegiatans()->count();
+        $totalPeserta = $lokasi->kegiatans()
+            ->withCount('peserta')
+            ->get()
+            ->sum('peserta_count');
+        $totalArsip = $lokasi->kegiatans()
+            ->withCount('arsip')
+            ->get()
+            ->sum('arsip_count');
+
+        // Get kegiatans with details
+        $kegiatans = $lokasi->kegiatans()
+            ->with('peserta', 'arsip')
+            ->latest()
+            ->get();
+
+        // Info Balai Bahasa
+        $infoBalai = [
+            'nama' => 'Balai Bahasa Provinsi Riau',
+            'alamat' => 'Jl. Sudirman No. 123, Pekanbaru, Riau',
+            'no_telp' => '(0761) 123456',
+            'email' => 'info@balaibahasariau.go.id',
+            'website' => 'www.balaibahasariau.go.id',
+        ];
+
+        return view('admin.peta.show', compact(
+            'lokasi',
+            'totalKegiatan',
+            'totalPeserta',
+            'totalArsip',
+            'kegiatans',
+            'infoBalai'
+        ));
+    }
+}
