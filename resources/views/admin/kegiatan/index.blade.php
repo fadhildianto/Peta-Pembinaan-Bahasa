@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2><i class="bi bi-calendar-event"></i> Manajemen Kegiatan</h2>
-            <p class="text-muted">Total: {{ $kegiatan->count() }} kegiatan</p>
+            <p class="text-muted">Total: {{ $kegiatan->total() }} kegiatan</p>
         </div>
         <a href="{{ route('admin.kegiatan.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Tambah Kegiatan
@@ -66,7 +66,7 @@
                 <tbody>
                     @forelse($kegiatan as $k)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ ($kegiatan->currentPage() - 1) * $kegiatan->perPage() + $loop->iteration }}</td>
                         <td>
                             <strong>{{ $k->nama_kegiatan }}</strong>
                         </td>
@@ -79,8 +79,8 @@
                         </td>
                         <td>{{ $k->tahun }}</td>
                         <td>{{ $k->lokasi->nama_kabupaten ?? '-' }}</td>
-                        <td><span class="badge bg-primary">{{ $k->peserta()->count() }}</span></td>
-                        <td><span class="badge bg-secondary">{{ $k->arsip()->count() }}</span></td>
+                        <td><span class="badge bg-primary">{{ $k->peserta_count }}</span></td>
+                        <td><span class="badge bg-secondary">{{ $k->arsip_count }}</span></td>
                         <td>
                             <small>
                                 @if($k->tanggal_mulai && $k->tanggal_selesai)
@@ -120,6 +120,10 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        {{ $kegiatan->links('pagination::bootstrap-5') }}
     </div>
 </div>
 

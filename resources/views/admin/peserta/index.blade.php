@@ -21,11 +21,11 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Nama</th>
+                        <th>Nama/Lembaga</th>
                         <th>Kegiatan</th>
+                        <th>Jenis</th>
                         <th>Instansi</th>
-                        <th>Email</th>
-                        <th>No Telp</th>
+                        <th>Kontak</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -34,15 +34,43 @@
                     <tr>
                         <td>{{ ($peserta->currentPage() - 1) * $peserta->perPage() + $loop->iteration }}</td>
                         <td>
-                            <strong>{{ $p->nama }}</strong>
+                            <strong>
+                                @if($p->kegiatan->jenis_kegiatan === 'Pembinaan Lembaga')
+                                    {{ $p->instansi ?? '-' }}
+                                @else
+                                    {{ $p->nama ?? '-' }}
+                                @endif
+                            </strong>
                         </td>
-                        <td>{{ $p->kegiatan->nama_kegiatan }}</td>
-                        <td>{{ $p->instansi ?? '-' }}</td>
-                        <td>{{ $p->email ?? '-' }}</td>
-                        <td>{{ $p->no_telp ?? '-' }}</td>
+                        <td>
+                            <small>{{ $p->kegiatan->nama_kegiatan }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ $p->kegiatan->jenis_kegiatan }}</span>
+                        </td>
+                        <td>
+                            @if($p->kegiatan->jenis_kegiatan === 'Penyuluhan Bahasa')
+                                <small>{{ $p->instansi ?? '-' }}</small>
+                            @else
+                                <small class="text-muted">-</small>
+                            @endif
+                        </td>
+                        <td>
+                            <small>
+                                @if($p->email)
+                                    <div>{{ $p->email }}</div>
+                                @endif
+                                @if($p->no_telp)
+                                    <div>{{ $p->no_telp }}</div>
+                                @endif
+                                @if(!$p->email && !$p->no_telp)
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </small>
+                        </td>
                         <td>
                             <a href="{{ route('admin.peserta.edit', $p->id) }}" 
-                               class="btn btn-sm btn-warning">
+                               class="btn btn-sm btn-warning" title="Edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <form action="{{ route('admin.peserta.destroy', $p->id) }}" 
@@ -50,7 +78,7 @@
                                   onsubmit="return confirm('Yakin hapus?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
@@ -70,8 +98,9 @@
 
     <!-- Pagination -->
     <div class="d-flex justify-content-center mt-4">
-        {{ $peserta->links() }}
+        {{ $peserta->links('pagination::bootstrap-5') }}
     </div>
 </div>
 
 @endsection
+

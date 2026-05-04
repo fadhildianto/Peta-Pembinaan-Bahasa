@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lokasi;
-use App\Models\Kegiatan;
 
 class PetaController extends Controller
 {
@@ -16,10 +15,10 @@ class PetaController extends Controller
         // Info Balai Bahasa Provinsi Riau
         $infoBalai = [
             'nama' => 'Balai Bahasa Provinsi Riau',
-            'alamat' => 'Jl. Sudirman No. 123, Pekanbaru, Riau',
-            'no_telp' => '(0761) 123456',
-            'email' => 'info@balaibahasariau.go.id',
-            'website' => 'www.balaibahasariau.go.id',
+            'alamat' => 'Jl. HR. Soebrantas Panam No.Km. 12,5, Simpang Baru, Kec. Tuah Madani, Kota Pekanbaru, Riau 28292',
+            'no_telp' => '(0761) 3223048',
+            'email' => 'balaibahasariau@kemendikdasmen.go.id',
+            'website' => 'balaibahasariau.kemendikdasmen.go.id',
             'latitude' => 0.5431,
             'longitude' => 101.4477,
         ];
@@ -32,9 +31,19 @@ class PetaController extends Controller
      */
     public function getMapData()
     {
-        $lokasis = Lokasi::with('kegiatans')
+        $isAdminRoute = request()->routeIs('admin.*');
+        $detailRoute = $isAdminRoute ? 'admin.peta.show' : 'peta.detail';
+
+        $lokasis = Lokasi::with([
+                'kegiatans' => fn ($query) => $query->withCount(['peserta', 'arsip']),
+            ])
+            ->withCount('kegiatans')
             ->get()
-            ->map(function ($lokasi) {
+            ->map(function ($lokasi) use ($detailRoute) {
+                // Hitung breakdown per jenis kegiatan
+                $penyuluhanCount = $lokasi->kegiatans->where('jenis_kegiatan', 'penyuluhan')->count();
+                $peminaanCount = $lokasi->kegiatans->where('jenis_kegiatan', 'pembinaan')->count();
+                
                 return [
                     'id' => $lokasi->id,
                     'nama' => $lokasi->nama_kabupaten,
@@ -42,16 +51,55 @@ class PetaController extends Controller
                     'longitude' => (float) $lokasi->longitude,
                     'deskripsi' => $lokasi->deskripsi ?? 'Lokasi di ' . $lokasi->nama_kabupaten,
                     'zoom_level' => $lokasi->zoom_level,
-                    'kegiatan_count' => $lokasi->kegiatans()->count(),
-                    'peserta_count' => $lokasi->kegiatans()
+                    'kegiatan_count' => $lokasi->kegiatans_count,
+                    'kegiatan_penyuluhan' => $penyuluhanCount,
+                    'kegiatan_pembinaan' => $peminaanCount,
+                    'peserta_count' => $lokasi->kegiatans->sum('peserta_count'),
+                    'arsip_count' => $lokasi->kegiatans->sum('arsip_count'),
+                    'detail_url' => route($detailRoute, $lokasi),
+                ];
+            });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $lokasis,
+        ]);
+    }
+
+    /**
+     * Get all locations with kegiatan count per type (API)
+     */
+    public function getMapDataPerType()
+    {
+        $lokasis = Lokasi::with('kegiatans')
+            ->get()
+            ->map(function ($lokasi) {
+                $kegiatans = $lokasi->kegiatans();
+                
+                return [
+                    'id' => $lokasi->id,
+                    'nama' => $lokasi->nama_kabupaten,
+                    'latitude' => (float) $lokasi->latitude,
+                    'longitude' => (float) $lokasi->longitude,
+                    'deskripsi' => $lokasi->deskripsi ?? 'Lokasi di ' . $lokasi->nama_kabupaten,
+                    'zoom_level' => $lokasi->zoom_level,
+                    
+                    // Breakdown per jenis kegiatan
+                    'kegiatan_penyuluhan' => $kegiatans->where('jenis_kegiatan', 'penyuluhan')->count(),
+                    'kegiatan_pembinaan' => $kegiatans->where('jenis_kegiatan', 'pembinaan')->count(),
+                    'total_kegiatan' => $kegiatans->count(),
+                    
+                    // Total peserta dan arsip
+                    'peserta_count' => $kegiatans
                         ->withCount('peserta')
                         ->get()
                         ->sum('peserta_count'),
-                    'arsip_count' => $lokasi->kegiatans()
+                    'arsip_count' => $kegiatans
                         ->withCount('arsip')
                         ->get()
                         ->sum('arsip_count'),
-                    'detail_url' => route('admin.peta.show', $lokasi->id),
+                        
+                    'detail_url' => route('peta.detail', $lokasi->id),
                 ];
             });
 
@@ -68,7 +116,7 @@ class PetaController extends Controller
     {
         $lokasi = Lokasi::findOrFail($lokasiId);
         $kegiatans = $lokasi->kegiatans()
-            ->with('peserta', 'arsip')
+            ->withCount(['peserta', 'arsip'])
             ->get()
             ->map(function ($kegiatan) {
                 return [
@@ -79,9 +127,8 @@ class PetaController extends Controller
                     'tanggal_mulai' => $kegiatan->tanggal_mulai?->format('d M Y'),
                     'tanggal_selesai' => $kegiatan->tanggal_selesai?->format('d M Y'),
                     'deskripsi' => $kegiatan->deskripsi,
-                    'peserta_count' => $kegiatan->peserta()->count(),
-                    'arsip_count' => $kegiatan->arsip()->count(),
-                    'detail_url' => route('admin.kegiatan.show', $kegiatan->id),
+                    'peserta_count' => $kegiatan->peserta_count,
+                    'arsip_count' => $kegiatan->arsip_count,
                 ];
             });
 
@@ -92,6 +139,7 @@ class PetaController extends Controller
                 'nama' => $lokasi->nama_kabupaten,
                 'latitude' => (float) $lokasi->latitude,
                 'longitude' => (float) $lokasi->longitude,
+                'detail_url' => route('peta.detail', $lokasi),
             ],
             'kegiatans' => $kegiatans,
         ]);
@@ -102,32 +150,22 @@ class PetaController extends Controller
      */
     public function show(Lokasi $lokasi)
     {
-        $lokasi->load('kegiatans.peserta', 'kegiatans.arsip');
-
-        // Get statistics
-        $totalKegiatan = $lokasi->kegiatans()->count();
-        $totalPeserta = $lokasi->kegiatans()
-            ->withCount('peserta')
-            ->get()
-            ->sum('peserta_count');
-        $totalArsip = $lokasi->kegiatans()
-            ->withCount('arsip')
-            ->get()
-            ->sum('arsip_count');
-
-        // Get kegiatans with details
         $kegiatans = $lokasi->kegiatans()
             ->with('peserta', 'arsip')
+            ->withCount(['peserta', 'arsip'])
             ->latest()
             ->get();
 
-        // Info Balai Bahasa
+        $totalKegiatan = $kegiatans->count();
+        $totalPeserta = $kegiatans->sum('peserta_count');
+        $totalArsip = $kegiatans->sum('arsip_count');
+
         $infoBalai = [
             'nama' => 'Balai Bahasa Provinsi Riau',
-            'alamat' => 'Jl. Sudirman No. 123, Pekanbaru, Riau',
-            'no_telp' => '(0761) 123456',
-            'email' => 'info@balaibahasariau.go.id',
-            'website' => 'www.balaibahasariau.go.id',
+            'alamat' => 'Jl. HR. Soebrantas Panam No.Km. 12,5, Simpang Baru, Kec. Tuah Madani, Kota Pekanbaru, Riau 28292',
+            'no_telp' => '(0761) 3223048',
+            'email' => 'balaibahasariau@kemendikdasmen.go.id',
+            'website' => 'balaibahasariau.kemendikdasmen.go.id',
         ];
 
         return view('admin.peta.show', compact(

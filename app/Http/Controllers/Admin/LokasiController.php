@@ -11,7 +11,10 @@ class LokasiController extends Controller
 {
     public function index()
     {
-        $lokasis = Lokasi::withCount('kegiatans')->latest()->get();
+        $lokasis = Lokasi::withCount('kegiatans')
+            ->latest()
+            ->get();
+
         return view('admin.lokasi.index', compact('lokasis'));
     }
 
@@ -44,7 +47,7 @@ class LokasiController extends Controller
     public function destroy(Lokasi $lokasi)
     {
         // Check if lokasi has kegiatans
-        if ($lokasi->kegiatans()->count() > 0) {
+        if ($lokasi->kegiatans()->exists()) {
             return redirect()->route('admin.lokasi.index')
                 ->with('error', 'Tidak bisa menghapus lokasi yang masih memiliki kegiatan');
         }

@@ -11,14 +11,13 @@ class PetaPublicController extends Controller
      */
     public function index()
     {
-        // Info Balai Bahasa Provinsi Riau
         $infoBalai = [
             'nama' => 'Balai Bahasa Provinsi Riau',
             'deskripsi' => 'Balai Bahasa Provinsi Riau adalah lembaga pemerintah yang bertugas melaksanakan pembinaan dan pengembangan bahasa, sastra, dan aksara Indonesia, serta melaksanakan pembinaan dan pengembangan bahasa-bahasa daerah.',
-            'alamat' => 'Jl. Sudirman No. 123, Pekanbaru, Riau',
-            'no_telp' => '(0761) 123456',
-            'email' => 'info@balaibahasariau.go.id',
-            'website' => 'www.balaibahasariau.go.id',
+            'alamat' => 'Jl. HR. Soebrantas Panam No.Km. 12,5, Simpang Baru, Kec. Tuah Madani, Kota Pekanbaru, Riau 28292',
+            'no_telp' => '(0761) 3223048',
+            'email' => 'balaibahasariau@kemendikdasmen.go.id',
+            'website' => 'balaibahasariau.kemendikdasmen.go.id',
             'latitude' => 0.5431,
             'longitude' => 101.4477,
         ];
@@ -31,36 +30,27 @@ class PetaPublicController extends Controller
      */
     public function show(Lokasi $lokasi)
     {
-        $lokasi->load('kegiatans.peserta', 'kegiatans.arsip');
-
-        // Get statistics
-        $totalKegiatan = $lokasi->kegiatans()->count();
-        $totalPeserta = $lokasi->kegiatans()
-            ->withCount('peserta')
-            ->get()
-            ->sum('peserta_count');
-        $totalArsip = $lokasi->kegiatans()
-            ->withCount('arsip')
-            ->get()
-            ->sum('arsip_count');
-
-        // Get kegiatans with details
         $kegiatans = $lokasi->kegiatans()
-            ->with('peserta', 'arsip')
+            ->with('arsip')
+            ->withCount(['peserta', 'arsip'])
             ->latest()
             ->get();
 
-        // Info Balai Bahasa
+        $totalKegiatan = $kegiatans->count();
+        $totalPeserta = $kegiatans->sum('peserta_count');
+        $totalArsip = $kegiatans->sum('arsip_count');
+
         $infoBalai = [
             'nama' => 'Balai Bahasa Provinsi Riau',
-            'deskripsi' => 'Balai Bahasa Provinsi Riau adalah lembaga pemerintah yang bertugas melaksanakan pembinaan dan pengembangan bahasa, sastra, dan aksara Indonesia.',
-            'alamat' => 'Jl. Sudirman No. 123, Pekanbaru, Riau',
-            'no_telp' => '(0761) 123456',
-            'email' => 'info@balaibahasariau.go.id',
-            'website' => 'www.balaibahasariau.go.id',
+            'misi' => 'Melaksanakan pembinaan dan pengembangan bahasa, sastra, dan aksara Indonesia, serta melaksanakan pembinaan dan pengembangan bahasa-bahasa daerah.',
+            'visi' => 'Terwujudnya pelindungan dan pengembangan bahasa serta sastra Indonesia yang kuat dan berkelanjutan.',
+            'alamat' => 'Jl. HR. Soebrantas Panam No.Km. 12,5, Simpang Baru, Kec. Tuah Madani, Kota Pekanbaru, Riau 28292',
+            'no_telp' => '(0761) 3223048',
+            'email' => 'balaibahasariau@kemendikdasmen.go.id',
+            'website' => 'balaibahasariau.kemendikdasmen.go.id',
         ];
 
-        return view('peta.show', compact(
+        return view('peta.detail', compact(
             'lokasi',
             'totalKegiatan',
             'totalPeserta',

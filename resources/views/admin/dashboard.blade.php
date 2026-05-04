@@ -136,8 +136,8 @@
                                     </td>
                                     <td>{{ $kegiatan->lokasi->nama_kabupaten }}</td>
                                     <td>{{ $kegiatan->tahun }}</td>
-                                    <td><span class="badge bg-primary">{{ $kegiatan->peserta()->count() }}</span></td>
-                                    <td><span class="badge bg-secondary">{{ $kegiatan->arsip()->count() }}</span></td>
+                                    <td><span class="badge bg-primary">{{ $kegiatan->peserta_count }}</span></td>
+                                    <td><span class="badge bg-secondary">{{ $kegiatan->arsip_count }}</span></td>
                                     <td>
                                         <a href="{{ route('admin.kegiatan.show', $kegiatan->id) }}" 
                                            class="btn btn-sm btn-outline-primary">

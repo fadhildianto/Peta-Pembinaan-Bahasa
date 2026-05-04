@@ -84,7 +84,7 @@
 
     <!-- Pagination -->
     <div class="d-flex justify-content-center mt-4">
-        {{ $arsip->links() }}
+        {{ $arsip->links('pagination::bootstrap-5') }}
     </div>
 </div>
 

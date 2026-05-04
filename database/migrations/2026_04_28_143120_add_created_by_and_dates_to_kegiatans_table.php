@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('kegiatans', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->after('lokasi_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('created_by')->nullable()->after('lokasi_id')->constrained('users')->nullOnDelete();
             $table->date('tanggal_mulai')->nullable()->after('deskripsi');
             $table->date('tanggal_selesai')->nullable()->after('tanggal_mulai');
         });
@@ -24,8 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('kegiatans', function (Blueprint $table) {
-            $table->dropForeignKeyConstraints();
-            $table->dropColumn(['created_by', 'tanggal_mulai', 'tanggal_selesai']);
+            $table->dropConstrainedForeignId('created_by');
+            $table->dropColumn(['tanggal_mulai', 'tanggal_selesai']);
         });
     }
 };

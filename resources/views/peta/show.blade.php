@@ -164,12 +164,12 @@
                     </td>
                     <td>
                         <span class="badge" style="background: #003d7a; color: white;">
-                            {{ $kegiatan->peserta()->count() }}
+                            {{ $kegiatan->peserta_count }}
                         </span>
                     </td>
                     <td>
                         <span class="badge" style="background: #6c757d; color: white;">
-                            {{ $kegiatan->arsip()->count() }}
+                            {{ $kegiatan->arsip_count }}
                         </span>
                     </td>
                     <td>
@@ -187,32 +187,16 @@
                             <div class="row mt-3 mb-3">
                                 <!-- Peserta -->
                                 <div class="col-md-6">
-                                    <h6 style="color: #003d7a;"><i class="bi bi-people"></i> Peserta ({{ $kegiatan->peserta()->count() }})</h6>
-                                    @if($kegiatan->peserta()->count() > 0)
-                                        <div style="max-height: 250px; overflow-y: auto;">
-                                            <table class="table table-sm table-borderless">
-                                                <tbody>
-                                                    @foreach($kegiatan->peserta as $p)
-                                                    <tr>
-                                                        <td>
-                                                            <strong>{{ $p->nama }}</strong><br>
-                                                            <small style="color: #666;">{{ $p->instansi ?? '-' }}</small><br>
-                                                            <small style="color: #666;">{{ $p->email ?? $p->no_telp ?? '-' }}</small>
-                                                        </td>
-                                                    </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    @else
-                                        <p class="text-muted">Belum ada peserta</p>
-                                    @endif
+                                    <h6 style="color: #003d7a;"><i class="bi bi-people"></i> Peserta ({{ $kegiatan->peserta_count }})</h6>
+                                    <div class="alert alert-light border mb-0" style="font-size: 13px;">
+                                        Data identitas peserta hanya tersedia di panel admin.
+                                    </div>
                                 </div>
 
                                 <!-- Arsip -->
                                 <div class="col-md-6">
-                                    <h6 style="color: #003d7a;"><i class="bi bi-file-earmark"></i> Arsip ({{ $kegiatan->arsip()->count() }})</h6>
-                                    @if($kegiatan->arsip()->count() > 0)
+                                    <h6 style="color: #003d7a;"><i class="bi bi-file-earmark"></i> Arsip ({{ $kegiatan->arsip_count }})</h6>
+                                    @if($kegiatan->arsip_count > 0)
                                         <div style="max-height: 250px; overflow-y: auto;">
                                             <div class="list-group list-group-flush">
                                                 @foreach($kegiatan->arsip as $a)
@@ -220,7 +204,7 @@
                                                     <i class="bi bi-file-earmark"></i>
                                                     <strong>{{ $a->nama_file }}</strong><br>
                                                     <small style="color: #666;">
-                                                        {{ strtoupper($a->tipe_file) }} • {{ $a->formatted_file_size }}
+                                                        {{ strtoupper($a->tipe_file) }} &bull; {{ $a->formatted_file_size }}
                                                     </small>
                                                 </div>
                                                 @endforeach

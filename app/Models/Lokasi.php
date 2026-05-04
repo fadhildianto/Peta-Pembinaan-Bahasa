@@ -33,6 +33,6 @@ class Lokasi extends Model
      */
     public function getKegiatanCountAttribute()
     {
-        return $this->kegiatans()->count();
+        return $this->attributes['kegiatans_count'] ?? $this->kegiatans()->count();
     }
 }

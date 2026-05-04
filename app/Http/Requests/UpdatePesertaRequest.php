@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Kegiatan;
 
 class UpdatePesertaRequest extends FormRequest
 {
@@ -19,14 +20,40 @@ class UpdatePesertaRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $kegiatanId = $this->input('kegiatan_id');
+        $kegiatan = Kegiatan::find($kegiatanId);
+        
+        $rules = [
             'kegiatan_id' => 'required|exists:kegiatans,id',
-            'nama' => 'required|string|max:255',
-            'instansi' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'no_telp' => 'nullable|string|max:20',
-            'alamat' => 'nullable|string|max:500',
         ];
+
+        // Conditional rules berdasarkan jenis kegiatan
+        if ($kegiatan) {
+            if ($kegiatan->jenis_kegiatan === 'Penyuluhan Bahasa') {
+                // Hanya nama dan instansi yang wajib
+                $rules['nama'] = 'required|string|max:255';
+                $rules['instansi'] = 'required|string|max:255';
+                $rules['email'] = 'nullable|email|max:255';
+                $rules['no_telp'] = 'nullable|string|max:20';
+                $rules['alamat'] = 'nullable|string|max:500';
+            } elseif ($kegiatan->jenis_kegiatan === 'Pembinaan Lembaga') {
+                // Hanya instansi yang wajib (sebagai nama lembaga)
+                $rules['nama'] = 'nullable|string|max:255';
+                $rules['instansi'] = 'required|string|max:255';
+                $rules['email'] = 'nullable|email|max:255';
+                $rules['no_telp'] = 'nullable|string|max:20';
+                $rules['alamat'] = 'nullable|string|max:500';
+            }
+        } else {
+            // Default rules jika kegiatan tidak ditemukan
+            $rules['nama'] = 'required|string|max:255';
+            $rules['instansi'] = 'nullable|string|max:255';
+            $rules['email'] = 'nullable|email|max:255';
+            $rules['no_telp'] = 'nullable|string|max:20';
+            $rules['alamat'] = 'nullable|string|max:500';
+        }
+
+        return $rules;
     }
 
     /**
@@ -39,6 +66,7 @@ class UpdatePesertaRequest extends FormRequest
             'kegiatan_id.exists' => 'Kegiatan tidak ditemukan',
             'nama.required' => 'Nama peserta harus diisi',
             'nama.max' => 'Nama peserta maksimal 255 karakter',
+            'instansi.required' => 'Instansi/Lembaga harus diisi',
             'instansi.max' => 'Nama instansi maksimal 255 karakter',
             'email.email' => 'Format email tidak valid',
             'email.max' => 'Email maksimal 255 karakter',
@@ -47,3 +75,4 @@ class UpdatePesertaRequest extends FormRequest
         ];
     }
 }
+

@@ -24,7 +24,10 @@ class ArsipController extends Controller
      */
     public function create()
     {
-        $kegiatans = Kegiatan::all();
+        $kegiatans = Kegiatan::orderByDesc('tahun')
+            ->orderBy('nama_kegiatan')
+            ->get();
+
         return view('admin.arsip.create', compact('kegiatans'));
     }
 
@@ -33,17 +36,16 @@ class ArsipController extends Controller
      */
     public function store(StoreArsipRequest $request)
     {
+        $validated = $request->validated();
         $file = $request->file('file');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $path = $file->storeAs('arsip', $filename, 'public');
+        $path = $file->store('arsip', 'public');
 
-        // Get file extension
-        $extension = $file->getClientOriginalExtension();
+        $extension = strtolower($file->getClientOriginalExtension());
+        $extension = $extension === 'jpeg' ? 'jpg' : $extension;
 
-        // Create arsip record
         Arsip::create([
-            'kegiatan_id' => $request->kegiatan_id,
-            'nama_file' => $request->nama_file,
+            'kegiatan_id' => $validated['kegiatan_id'],
+            'nama_file' => $validated['nama_file'],
             'path_file' => $path,
             'tipe_file' => $extension,
             'file_size' => $file->getSize(),
@@ -58,7 +60,16 @@ class ArsipController extends Controller
      */
     public function show(Arsip $arsip)
     {
-        return response()->download(storage_path('app/public/' . $arsip->path_file));
+        if (! Storage::disk('public')->exists($arsip->path_file)) {
+            abort(404, 'File arsip tidak ditemukan');
+        }
+
+        $downloadName = $arsip->nama_file . '.' . $arsip->tipe_file;
+
+        return response()->download(
+            Storage::disk('public')->path($arsip->path_file),
+            $downloadName
+        );
     }
 
     /**

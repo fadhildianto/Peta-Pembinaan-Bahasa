@@ -74,12 +74,39 @@
 
 @push('scripts')
 <script>
+    const kegiatanByLokasiUrl = @json(route('api.kegiatan-by-lokasi', ['lokasiId' => '__ID__']));
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, function (character) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[character];
+        });
+    }
+
+    function routeWithId(template, id) {
+        return template.replace('__ID__', encodeURIComponent(id));
+    }
+
+    function safeUrl(value) {
+        try {
+            const url = new URL(value, window.location.origin);
+            return url.origin === window.location.origin ? url.href : '#';
+        } catch (error) {
+            return '#';
+        }
+    }
+
     // Initialize Map
     const map = L.map('map').setView([0.5431, 101.4477], 8);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
+        attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 19,
     }).addTo(map);
 
@@ -105,33 +132,54 @@
                         { icon: greenIcon }
                     ).addTo(map);
 
-                    // Create popup content
+                    // Create popup content dengan breakdown per jenis
                     const popupContent = `
-                        <div style="min-width: 280px;">
-                            <h6 style="margin-bottom: 8px; color: #003d7a;"><strong>${lokasi.nama}</strong></h6>
-                            <p style="margin-bottom: 8px; font-size: 13px;">
-                                <i class="bi bi-calendar-event"></i> Kegiatan: <strong>${lokasi.kegiatan_count}</strong>
-                            </p>
-                            <p style="margin-bottom: 8px; font-size: 13px;">
-                                <i class="bi bi-people"></i> Peserta: <strong>${lokasi.peserta_count}</strong>
-                            </p>
-                            <p style="margin-bottom: 12px; font-size: 13px;">
-                                <i class="bi bi-file-earmark"></i> Arsip: <strong>${lokasi.arsip_count}</strong>
-                            </p>
-                            <div style="display: flex; gap: 8px;">
-                                <button onclick="showKegiatanModal(${lokasi.id}, '${lokasi.nama}')" 
-                                        class="btn btn-sm" style="flex: 1; background: #003d7a; color: white; border: none; border-radius: 4px; padding: 6px; font-size: 12px; cursor: pointer;">
-                                    Lihat Kegiatan
-                                </button>
-                                <a href="${lokasi.detail_url}" 
-                                   class="btn btn-sm" style="flex: 1; background: #ffc107; color: #333; border: none; border-radius: 4px; padding: 6px; font-size: 12px; text-decoration: none;">
-                                    Detail Lengkap
-                                </a>
-                            </div>
-                        </div>
-                    `;
+    <div style="min-width: 320px;">
+        <h6 style="margin-bottom: 12px; color: #003d7a;"><strong>${lokasi.nama}</strong></h6>
+        
+        <!-- Breakdown Kegiatan -->
+        <div style="background: #f8f9fa; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+            <div style="margin-bottom: 8px;">
+                <span style="background: #0dcaf0; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: 600;">
+                    <i class="bi bi-book"></i> Penyuluhan Bahasa
+                </span>
+                <span style="margin-left: 8px; font-weight: 700; color: #003d7a; font-size: 14px;">
+                    ${lokasi.kegiatan_penyuluhan}
+                </span>
+            </div>
+            <div>
+                <span style="background: #ffc107; color: #333; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: 600;">
+                    <i class="bi bi-building"></i> Pembinaan Lembaga
+                </span>
+                <span style="margin-left: 8px; font-weight: 700; color: #003d7a; font-size: 14px;">
+                    ${lokasi.kegiatan_pembinaan}
+                </span>
+            </div>
+        </div>
+        
+        <!-- Total Stats -->
+        <p style="margin-bottom: 8px; font-size: 13px; color: #666;">
+            <i class="bi bi-people"></i> <strong>Peserta:</strong> ${lokasi.peserta_count}
+        </p>
+        <p style="margin-bottom: 12px; font-size: 13px; color: #666;">
+            <i class="bi bi-file-earmark"></i> <strong>Arsip:</strong> ${lokasi.arsip_count}
+        </p>
+        
+        <!-- Buttons -->
+        <div style="display: flex; gap: 8px;">
+            <button onclick="showKegiatanModal(${lokasi.id}, '${lokasi.nama}')" 
+                    class="btn btn-sm" style="flex: 1; background: #003d7a; color: white; border: none; border-radius: 4px; padding: 6px; font-size: 12px; cursor: pointer;">
+                Lihat Kegiatan
+            </button>
+            <a href="${lokasi.detail_url}" 
+               class="btn btn-sm" style="flex: 1; background: #ffc107; color: #333; border: none; border-radius: 4px; padding: 6px; font-size: 12px; text-decoration: none; text-align: center;">
+                Detail Lengkap
+            </a>
+        </div>
+    </div>
+    `;
 
-                    marker.bindPopup(popupContent, { maxWidth: 320 });
+                    marker.bindPopup(popupContent, { maxWidth: 350 });
                 });
             }
         })
@@ -141,7 +189,7 @@
 
     // Function to show kegiatan modal
     function showKegiatanModal(lokasiId, lokasiNama) {
-        fetch(`{{ route("api.kegiatan-by-lokasi", ":id") }}`.replace(':id', lokasiId))
+        fetch(routeWithId(kegiatanByLokasiUrl, lokasiId))
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
@@ -149,36 +197,36 @@
 
                     if (data.kegiatans.length > 0) {
                         data.kegiatans.forEach(kegiatan => {
-                            const badge = kegiatan.jenis === 'penyuluhan' 
-                                ? '<span style="background: #0dcaf0; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">Penyuluhan</span>' 
+                            const badge = kegiatan.jenis === 'penyuluhan'
+                                ? '<span style="background: #0dcaf0; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">Penyuluhan</span>'
                                 : '<span style="background: #ffc107; color: #333; padding: 2px 8px; border-radius: 3px; font-size: 11px;">Pembinaan</span>';
+                            const detailUrl = escapeHtml(safeUrl(kegiatan.detail_url));
 
                             kegiatanHTML += `
-                                <div style="border-bottom: 1px solid #e0e0e0; padding: 12px 0; margin-bottom: 12px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                        <h6 style="margin: 0; flex: 1; color: #003d7a;">${kegiatan.nama}</h6>
-                                        ${badge}
-                                    </div>
-                                    <p style="margin: 4px 0; font-size: 12px; color: #666;">
-                                        <i class="bi bi-calendar"></i> ${kegiatan.tahun} • ${kegiatan.tanggal_mulai} s/d ${kegiatan.tanggal_selesai}
-                                    </p>
-                                    <p style="margin: 4px 0; font-size: 12px; color: #666;">
-                                        <i class="bi bi-people"></i> Peserta: ${kegiatan.peserta_count} • 
-                                        <i class="bi bi-file-earmark"></i> Arsip: ${kegiatan.arsip_count}
-                                    </p>
-                                    <a href="${kegiatan.detail_url}" class="btn btn-sm" style="margin-top: 6px; padding: 4px 8px; font-size: 11px; background: #003d7a; color: white; border: none; border-radius: 3px; text-decoration: none; cursor: pointer;">
-                                        <i class="bi bi-eye"></i> Lihat Detail
-                                    </a>
-                                </div>
-                            `;
+    <div style="border-bottom: 1px solid #e0e0e0; padding: 12px 0; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+            <h6 style="margin: 0; flex: 1; color: #003d7a;">${escapeHtml(kegiatan.nama)}</h6>
+            ${badge}
+        </div>
+        <p style="margin: 4px 0; font-size: 12px; color: #666;">
+            <i class="bi bi-calendar"></i> ${escapeHtml(kegiatan.tahun ?? '-')} &bull; ${escapeHtml(kegiatan.tanggal_mulai ?? '-')} s/d ${escapeHtml(kegiatan.tanggal_selesai ?? '-')}
+        </p>
+        <p style="margin: 4px 0; font-size: 12px; color: #666;">
+            <i class="bi bi-people"></i> Peserta: ${escapeHtml(kegiatan.peserta_count)} &bull; 
+            <i class="bi bi-file-earmark"></i> Arsip: ${escapeHtml(kegiatan.arsip_count)}
+        </p>
+        <a href="${detailUrl}" class="btn btn-xs btn-outline-primary" style="margin-top: 6px; padding: 4px 8px; font-size: 11px;">
+    <i class="bi bi-eye"></i> Lihat Detail
+        </a>
+    </div>
+`;
                         });
                     } else {
                         kegiatanHTML = '<p class="text-muted text-center py-3">Belum ada kegiatan di lokasi ini</p>';
                     }
 
-                    // Show modal using Bootstrap
                     const modal = new bootstrap.Modal(document.getElementById('kegiatanModal'));
-                    document.getElementById('modalTitle').innerHTML = `<i class="bi bi-calendar-event"></i> Kegiatan di ${lokasiNama}`;
+                    document.getElementById('modalTitle').textContent = `Kegiatan di ${data.lokasi?.nama ?? 'Lokasi'}`;
                     document.getElementById('modalContent').innerHTML = kegiatanHTML;
                     modal.show();
                 }

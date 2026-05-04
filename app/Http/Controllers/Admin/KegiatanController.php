@@ -7,18 +7,37 @@ use App\Http\Requests\StoreKegiatanRequest;
 use App\Http\Requests\UpdateKegiatanRequest;
 use App\Models\Kegiatan;
 use App\Models\Lokasi;
+use Illuminate\Http\Request;
 
 class KegiatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kegiatan = Kegiatan::with('lokasi')->latest()->get();
+        $jenis = $request->input('jenis');
+        $tahun = $request->input('tahun');
+
+        $kegiatan = Kegiatan::query()
+            ->with('lokasi')
+            ->withCount(['peserta', 'arsip'])
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $query->where('nama_kegiatan', 'like', '%' . $request->string('search') . '%');
+            })
+            ->when(in_array($jenis, ['penyuluhan', 'pembinaan'], true), function ($query) use ($jenis) {
+                $query->where('jenis_kegiatan', $jenis);
+            })
+            ->when(is_numeric($tahun), function ($query) use ($tahun) {
+                $query->where('tahun', (int) $tahun);
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
         return view('admin.kegiatan.index', compact('kegiatan'));
     }
 
     public function create()
     {
-        $lokasi = Lokasi::all();
+        $lokasi = Lokasi::orderBy('nama_kabupaten')->get();
         return view('admin.kegiatan.create', compact('lokasi'));
     }
 
@@ -35,13 +54,15 @@ class KegiatanController extends Controller
 
     public function show(Kegiatan $kegiatan)
     {
-        $kegiatan->load(['lokasi', 'peserta', 'arsip']);
+        $kegiatan->load(['lokasi', 'peserta', 'arsip'])
+            ->loadCount(['peserta', 'arsip']);
+
         return view('admin.kegiatan.show', compact('kegiatan'));
     }
 
     public function edit(Kegiatan $kegiatan)
     {
-        $lokasi = Lokasi::all();
+        $lokasi = Lokasi::orderBy('nama_kabupaten')->get();
         return view('admin.kegiatan.edit', compact('kegiatan', 'lokasi'));
     }
 
@@ -61,6 +82,4 @@ class KegiatanController extends Controller
             ->with('success', 'Kegiatan berhasil dihapus');
     }
 }
-
-
 

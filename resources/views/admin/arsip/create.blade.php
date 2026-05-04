@@ -19,7 +19,7 @@
                             <select name="kegiatan_id" class="form-select @error('kegiatan_id') is-invalid @enderror">
                                 <option value="">-- Pilih Kegiatan --</option>
                                 @foreach($kegiatans as $kegiatan)
-                                    <option value="{{ $kegiatan->id }}" @if(old('kegiatan_id') == $kegiatan->id) selected @endif>
+                                    <option value="{{ $kegiatan->id }}" @if(old('kegiatan_id', request('kegiatan_id')) == $kegiatan->id) selected @endif>
                                         {{ $kegiatan->nama_kegiatan }} ({{ $kegiatan->tahun }})
                                     </option>
                                 @endforeach

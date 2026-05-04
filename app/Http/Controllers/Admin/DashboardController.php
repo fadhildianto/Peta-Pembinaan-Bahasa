@@ -21,6 +21,7 @@ class DashboardController extends Controller
 
         // Get recent kegiatans
         $kegiatanTerbaru = Kegiatan::with('lokasi', 'createdBy')
+            ->withCount(['peserta', 'arsip'])
             ->latest()
             ->take(5)
             ->get();

@@ -60,7 +60,7 @@ class Kegiatan extends Model
      */
     public function getPesertaCountAttribute()
     {
-        return $this->peserta()->count();
+        return $this->attributes['peserta_count'] ?? $this->peserta()->count();
     }
 
     /**
@@ -68,6 +68,6 @@ class Kegiatan extends Model
      */
     public function getArsipCountAttribute()
     {
-        return $this->arsip()->count();
+        return $this->attributes['arsip_count'] ?? $this->arsip()->count();
     }
 }

@@ -124,7 +124,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/admin/dashboard">
+                        <a class="nav-link" href="{{ route('dashboard') }}">
                             <i class="bi bi-speedometer2"></i> Admin
                         </a>
                     </li>
@@ -157,9 +157,9 @@
                 <div class="col-md-6">
                     <h5>Kontak</h5>
                     <p>
-                        <i class="bi bi-telephone"></i> (0761) 123456<br>
-                        <i class="bi bi-envelope"></i> <a href="mailto:info@balaibahasariau.go.id">info@balaibahasariau.go.id</a><br>
-                        <i class="bi bi-globe"></i> <a href="https://balaibahasariau.go.id" target="_blank">balaibahasariau.go.id</a>
+                        <i class="bi bi-telephone"></i> (0761) 3223048<br>
+                        <i class="bi bi-envelope"></i> <a href="mailto:balaibahasariau@kemendikdasmen.go.id">balaibahasariau@kemendikdasmen.go.id</a><br>
+                        <i class="bi bi-globe"></i> <a href="https://balaibahasariau.kemendikdasmen.go.id" target="_blank">balaibahasariau.kemendikdasmen.go.id</a>
                     </p>
                 </div>
             </div>

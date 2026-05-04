@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('arsips', function (Blueprint $table) {
-            $table->enum('tipe_file', ['pdf', 'jpg', 'png', 'doc', 'docx'])->default('pdf')->after('nama_file');
+            $table->enum('tipe_file', ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'])->default('pdf')->after('nama_file');
             $table->bigInteger('file_size')->nullable()->after('tipe_file');
         });
     }

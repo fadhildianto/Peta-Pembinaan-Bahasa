@@ -42,7 +42,7 @@
                             </small>
                         </td>
                         <td>
-                            <span class="badge bg-primary">{{ $l->kegiatans()->count() }}</span>
+                            <span class="badge bg-primary">{{ $l->kegiatans_count }}</span>
                         </td>
                         <td>
                             <small>{{ Str::limit($l->deskripsi, 40) ?? '-' }}</small>

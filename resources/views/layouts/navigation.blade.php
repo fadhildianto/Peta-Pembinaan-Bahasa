@@ -7,24 +7,30 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ url('/admin/dashboard') }}">
+                    <a href="{{ route('dashboard') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
                 </div>
 
                 <!-- Menu -->
                 <div class="hidden space-x-8 sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ url('/admin/dashboard') }}">
-                        Dashboard
-                    </x-nav-link>
+                    @if(Auth::user()->role === 'admin')
+                        <x-nav-link href="{{ route('admin.dashboard') }}">
+                            Dashboard
+                        </x-nav-link>
 
-                    <x-nav-link href="{{ url('/admin/kegiatan') }}">
-                        Kegiatan
-                    </x-nav-link>
+                        <x-nav-link href="{{ route('admin.kegiatan.index') }}">
+                            Kegiatan
+                        </x-nav-link>
 
-                    <x-nav-link href="{{ url('/admin/lokasi') }}">
-                        Lokasi
-                    </x-nav-link>
+                        <x-nav-link href="{{ route('admin.lokasi.index') }}">
+                            Lokasi
+                        </x-nav-link>
+                    @else
+                        <x-nav-link href="{{ route('peta.index') }}">
+                            Peta
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -55,7 +61,7 @@
             <!-- MOBILE BUTTON -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = !open" class="p-2">
-                    ☰
+                    Menu
                 </button>
             </div>
         </div>
@@ -64,9 +70,13 @@
     <!-- MOBILE MENU -->
     <div x-show="open" class="sm:hidden px-4 pb-4">
 
-        <a href="{{ url('/admin/dashboard') }}" class="block py-2">Dashboard</a>
-        <a href="{{ url('/admin/kegiatan') }}" class="block py-2">Kegiatan</a>
-        <a href="{{ url('/admin/lokasi') }}" class="block py-2">Lokasi</a>
+        @if(Auth::user()->role === 'admin')
+            <a href="{{ route('admin.dashboard') }}" class="block py-2">Dashboard</a>
+            <a href="{{ route('admin.kegiatan.index') }}" class="block py-2">Kegiatan</a>
+            <a href="{{ route('admin.lokasi.index') }}" class="block py-2">Lokasi</a>
+        @else
+            <a href="{{ route('peta.index') }}" class="block py-2">Peta</a>
+        @endif
 
         <div class="border-t mt-3 pt-3">
             <div class="mb-2 font-semibold">{{ Auth::user()->name }}</div>

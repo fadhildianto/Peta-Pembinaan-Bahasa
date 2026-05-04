@@ -24,8 +24,27 @@ class PesertaController extends Controller
      */
     public function create()
     {
-        $kegiatans = Kegiatan::all();
+        $kegiatans = Kegiatan::orderByDesc('tahun')
+            ->orderBy('nama_kegiatan')
+            ->get();
+
         return view('admin.peserta.create', compact('kegiatans'));
+    }
+
+    /**
+     * Get kegiatan details for AJAX
+     */
+    public function getKegiatanDetails($id)
+    {
+        $kegiatan = Kegiatan::find($id);
+        
+        if (!$kegiatan) {
+            return response()->json(['error' => 'Kegiatan not found'], 404);
+        }
+
+        return response()->json([
+            'jenis_kegiatan' => $kegiatan->jenis_kegiatan
+        ]);
     }
 
     /**
@@ -52,7 +71,10 @@ class PesertaController extends Controller
      */
     public function edit(Peserta $peserta)
     {
-        $kegiatans = Kegiatan::all();
+        $kegiatans = Kegiatan::orderByDesc('tahun')
+            ->orderBy('nama_kegiatan')
+            ->get();
+
         return view('admin.peserta.edit', compact('peserta', 'kegiatans'));
     }
 

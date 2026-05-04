@@ -95,7 +95,7 @@
     <!-- Peserta Section -->
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="bi bi-people"></i> Peserta ({{ $kegiatan->peserta()->count() }})</h5>
+            <h5 class="mb-0"><i class="bi bi-people"></i> Peserta ({{ $kegiatan->peserta_count }})</h5>
             <a href="{{ route('admin.peserta.create') }}?kegiatan_id={{ $kegiatan->id }}" class="btn btn-sm btn-primary">
                 <i class="bi bi-plus"></i> Tambah Peserta
             </a>
@@ -147,7 +147,7 @@
     <!-- Arsip Section -->
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="bi bi-file-earmark"></i> Arsip ({{ $kegiatan->arsip()->count() }})</h5>
+            <h5 class="mb-0"><i class="bi bi-file-earmark"></i> Arsip ({{ $kegiatan->arsip_count }})</h5>
             <a href="{{ route('admin.arsip.create') }}?kegiatan_id={{ $kegiatan->id }}" class="btn btn-sm btn-primary">
                 <i class="bi bi-cloud-upload"></i> Upload File
             </a>

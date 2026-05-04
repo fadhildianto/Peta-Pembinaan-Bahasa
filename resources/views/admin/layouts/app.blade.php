@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <title>Admin Panel - Balai Bahasa</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,6 +21,8 @@
             color: white;
             position: fixed;
             overflow-y: auto;
+            z-index: 1030;
+            transition: transform 0.2s ease;
         }
 
         .sidebar h4 {
@@ -55,6 +58,21 @@
             padding: 30px;
             background: #f4f6f9;
             min-height: 100vh;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 1040;
+            border: none;
+            border-radius: 8px;
+            background: #1e293b;
+            color: white;
+            width: 42px;
+            height: 42px;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
         }
 
         .card {
@@ -105,12 +123,23 @@
 
         @media (max-width: 768px) {
             .sidebar {
-                width: 200px;
+                width: 240px;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
             }
 
             .main {
-                margin-left: 200px;
-                padding: 15px;
+                margin-left: 0;
+                padding: 72px 15px 15px;
+            }
+
+            .mobile-menu-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
             }
         }
     </style>
@@ -118,7 +147,11 @@
 
 <body>
 
-<div class="sidebar">
+<button class="mobile-menu-btn" type="button" id="adminSidebarToggle" aria-label="Buka menu admin">
+    <i class="bi bi-list fs-4"></i>
+</button>
+
+<div class="sidebar" id="adminSidebar">
     <h4>
         <i class="bi bi-speedometer2"></i> Admin
     </h4>
@@ -172,6 +205,22 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const adminSidebar = document.getElementById('adminSidebar');
+    const adminSidebarToggle = document.getElementById('adminSidebarToggle');
+
+    adminSidebarToggle?.addEventListener('click', () => {
+        adminSidebar?.classList.toggle('show');
+    });
+
+    adminSidebar?.querySelectorAll('a, button[type="submit"]').forEach((item) => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                adminSidebar.classList.remove('show');
+            }
+        });
+    });
+</script>
 @stack('scripts')
 
 </body>
