@@ -4,12 +4,12 @@
 
 <div class="container-fluid">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="admin-page-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
             <h2><i class="bi bi-calendar-event"></i> {{ $kegiatan->nama_kegiatan }}</h2>
-            <p class="text-muted">Detail lengkap kegiatan</p>
+            <p>Detail lengkap kegiatan</p>
         </div>
-        <div>
+        <div class="admin-action-group">
             <a href="{{ route('admin.kegiatan.edit', $kegiatan->id) }}" class="btn btn-warning">
                 <i class="bi bi-pencil"></i> Edit
             </a>
@@ -28,7 +28,7 @@
     <!-- Info Cards -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
-            <div class="card">
+            <div class="card admin-card-interactive">
                 <div class="card-body">
                     <small class="text-muted">Jenis Kegiatan</small>
                     <div class="mt-2">
@@ -43,7 +43,7 @@
         </div>
 
         <div class="col-md-3 mb-3">
-            <div class="card">
+            <div class="card admin-card-interactive">
                 <div class="card-body">
                     <small class="text-muted">Lokasi</small>
                     <div class="mt-2">
@@ -54,7 +54,7 @@
         </div>
 
         <div class="col-md-3 mb-3">
-            <div class="card">
+            <div class="card admin-card-interactive">
                 <div class="card-body">
                     <small class="text-muted">Tahun</small>
                     <div class="mt-2">
@@ -65,7 +65,7 @@
         </div>
 
         <div class="col-md-3 mb-3">
-            <div class="card">
+            <div class="card admin-card-interactive">
                 <div class="card-body">
                     <small class="text-muted">Tanggal</small>
                     <div class="mt-2">
@@ -82,7 +82,7 @@
 
     <!-- Deskripsi -->
     @if($kegiatan->deskripsi)
-    <div class="card mb-4">
+    <div class="card admin-card-interactive mb-4">
         <div class="card-header">
             <h5 class="mb-0">Deskripsi</h5>
         </div>
@@ -93,7 +93,7 @@
     @endif
 
     <!-- Peserta Section -->
-    <div class="card mb-4">
+    <div class="card admin-card-interactive mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="bi bi-people"></i> Peserta ({{ $kegiatan->peserta_count }})</h5>
             <a href="{{ route('admin.peserta.create') }}?kegiatan_id={{ $kegiatan->id }}" class="btn btn-sm btn-primary">
@@ -119,6 +119,7 @@
                         <td>{{ $p->email ?? '-' }}</td>
                         <td>{{ $p->no_telp ?? '-' }}</td>
                         <td>
+                            <div class="admin-action-group">
                             <a href="{{ route('admin.peserta.edit', $p->id) }}" 
                                class="btn btn-sm btn-warning">
                                 <i class="bi bi-pencil"></i>
@@ -132,11 +133,12 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center text-muted py-3">Belum ada peserta</td>
+                        <td colspan="5" class="text-center admin-empty-state"><i class="bi bi-people"></i>Belum ada peserta</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -145,7 +147,7 @@
     </div>
 
     <!-- Arsip Section -->
-    <div class="card">
+    <div class="card admin-card-interactive">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="bi bi-file-earmark"></i> Arsip ({{ $kegiatan->arsip_count }})</h5>
             <a href="{{ route('admin.arsip.create') }}?kegiatan_id={{ $kegiatan->id }}" class="btn btn-sm btn-primary">
@@ -184,6 +186,7 @@
                         <td>{{ $a->formatted_file_size }}</td>
                         <td><small>{{ $a->created_at->format('d M Y') }}</small></td>
                         <td>
+                            <div class="admin-action-group">
                             <a href="{{ route('admin.arsip.show', $a->id) }}" 
                                class="btn btn-sm btn-info" download>
                                 <i class="bi bi-download"></i>
@@ -197,11 +200,12 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center text-muted py-3">Belum ada arsip</td>
+                        <td colspan="5" class="text-center admin-empty-state"><i class="bi bi-archive"></i>Belum ada arsip</td>
                     </tr>
                     @endforelse
                 </tbody>

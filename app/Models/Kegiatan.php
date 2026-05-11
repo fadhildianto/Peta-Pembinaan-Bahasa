@@ -24,6 +24,28 @@ class Kegiatan extends Model
     ];
 
     /**
+     * Set the jenis_kegiatan attribute with proper case
+     */
+    public function setJenisKegiatanAttribute($value)
+    {
+        if (!$value) {
+            $this->attributes['jenis_kegiatan'] = $value;
+            return;
+        }
+
+        $normalized = strtolower(trim($value));
+        
+        if ($normalized === 'penyuluhan') {
+            $this->attributes['jenis_kegiatan'] = 'Penyuluhan Bahasa';
+        } elseif ($normalized === 'pembinaan') {
+            $this->attributes['jenis_kegiatan'] = 'Pembinaan Lembaga';
+        } else {
+            // Keep original if already in proper format
+            $this->attributes['jenis_kegiatan'] = $value;
+        }
+    }
+
+    /**
      * Get the lokasi this kegiatan belongs to
      */
     public function lokasi()

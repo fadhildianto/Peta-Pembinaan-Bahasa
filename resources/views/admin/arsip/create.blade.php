@@ -3,9 +3,14 @@
 @section('content')
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
+    <div class="admin-page-hero">
+        <h2><i class="bi bi-cloud-upload"></i> Upload Arsip</h2>
+        <p>Unggah dokumen atau dokumentasi kegiatan agar arsip tersimpan rapi di sistem.</p>
+    </div>
+
+    <div class="row admin-create-layout g-4">
+        <div class="col-lg-8">
+            <div class="card admin-card-interactive admin-form-card admin-create-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> Upload Arsip</h5>
                 </div>
@@ -62,7 +67,7 @@
                         </div>
 
                         <!-- Buttons -->
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 admin-create-actions">
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-cloud-upload"></i> Upload
                             </button>
@@ -75,7 +80,7 @@
             </div>
 
             <!-- Info Card -->
-            <div class="card mt-3">
+            <div class="card admin-card-interactive mt-3">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Tips Upload</h5>
                 </div>
@@ -86,6 +91,19 @@
                         <li>Pastikan file tidak corrupt sebelum upload</li>
                         <li>Untuk gambar, gunakan format PNG atau JPG dengan resolusi optimal</li>
                     </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card admin-card-interactive admin-create-side">
+                <div class="card-body">
+                    <div class="admin-create-icon"><i class="bi bi-folder2-open"></i></div>
+                    <h5 class="mb-2">Arsip Kegiatan</h5>
+                    <p class="text-muted mb-3">File akan ditautkan ke kegiatan yang dipilih.</p>
+                    <div class="admin-create-pill"><i class="bi bi-calendar-event"></i> Relasi kegiatan</div>
+                    <div class="admin-create-pill"><i class="bi bi-file-earmark"></i> Nama file</div>
+                    <div class="admin-create-pill"><i class="bi bi-hdd"></i> Maksimal 10 MB</div>
                 </div>
             </div>
         </div>

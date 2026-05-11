@@ -3,9 +3,14 @@
 @section('content')
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
+    <div class="admin-page-hero">
+        <h2><i class="bi bi-geo-alt"></i> Tambah Lokasi</h2>
+        <p>Tambahkan wilayah dan koordinat untuk menampilkan persebaran kegiatan dengan lebih akurat.</p>
+    </div>
+
+    <div class="row admin-create-layout g-4">
+        <div class="col-lg-8">
+            <div class="card admin-card-interactive admin-form-card admin-create-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Tambah Lokasi Baru</h5>
                 </div>
@@ -86,7 +91,7 @@
                         </div>
 
                         <!-- Buttons -->
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 admin-create-actions">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-circle"></i> Simpan
                             </button>
@@ -95,6 +100,19 @@
                             </a>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card admin-card-interactive admin-create-side">
+                <div class="card-body">
+                    <div class="admin-create-icon"><i class="bi bi-map"></i></div>
+                    <h5 class="mb-2">Koordinat Lokasi</h5>
+                    <p class="text-muted mb-3">Pastikan titik latitude dan longitude sesuai wilayah yang dipilih.</p>
+                    <div class="admin-create-pill"><i class="bi bi-compass"></i> Latitude</div>
+                    <div class="admin-create-pill"><i class="bi bi-signpost"></i> Longitude</div>
+                    <div class="admin-create-pill"><i class="bi bi-search"></i> Zoom peta</div>
                 </div>
             </div>
         </div>

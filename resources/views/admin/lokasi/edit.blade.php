@@ -5,7 +5,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card admin-card-interactive admin-form-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-pencil"></i> Edit Lokasi</h5>
                 </div>

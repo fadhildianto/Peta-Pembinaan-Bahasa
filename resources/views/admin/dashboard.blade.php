@@ -2,35 +2,140 @@
 
 @section('content')
 
+<style>
+    .dashboard-hero {
+        background: linear-gradient(135deg, #003d7a 0%, #1d6fb8 58%, #12a7d9 100%);
+        border-radius: 8px;
+        color: #ffffff;
+        padding: 26px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 18px 38px rgba(0, 61, 122, 0.18);
+    }
+
+    .dashboard-hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -80px -120px auto;
+        width: 240px;
+        height: 240px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+    .dashboard-hero h2,
+    .dashboard-hero p {
+        position: relative;
+        z-index: 1;
+    }
+
+    .dashboard-hero p {
+        color: rgba(255, 255, 255, 0.82);
+    }
+
+    .dashboard-stat {
+        position: relative;
+        min-height: 154px;
+        text-align: left;
+        overflow: hidden;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .dashboard-stat:hover,
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 42px rgba(15, 23, 42, 0.13);
+    }
+
+    .dashboard-stat .stat-icon {
+        width: 46px;
+        height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 22px;
+        margin-bottom: 18px;
+    }
+
+    .dashboard-stat .number {
+        font-size: 34px;
+        line-height: 1;
+    }
+
+    .dashboard-stat::after {
+        content: "";
+        position: absolute;
+        right: -42px;
+        top: -42px;
+        width: 116px;
+        height: 116px;
+        border-radius: 50%;
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    .stat-blue .stat-icon { background: #2563eb; }
+    .stat-green .stat-icon { background: #059669; }
+    .stat-cyan .stat-icon { background: #0891b2; }
+    .stat-amber .stat-icon { background: #d97706; }
+    .stat-red .stat-icon { background: #dc2626; }
+    .stat-violet .stat-icon { background: #7c3aed; }
+
+    .dashboard-card {
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .dashboard-card .card-header {
+        padding: 16px 18px;
+    }
+
+    .dashboard-card .card-body {
+        min-height: 340px;
+    }
+
+    .dashboard-table tbody tr {
+        transition: transform 0.16s ease, background 0.16s ease;
+    }
+
+    .dashboard-table tbody tr:hover {
+        transform: scale(1.005);
+    }
+</style>
+
 <div class="container-fluid">
     <!-- Page Title -->
-    <div class="mb-4">
-        <h2><i class="bi bi-graph-up"></i> Dashboard</h2>
-        <p class="text-muted">Selamat datang, {{ Auth::user()->name }}!</p>
+    <div class="dashboard-hero mb-4">
+        <h2 class="mb-2"><i class="bi bi-graph-up-arrow"></i> Dashboard Admin</h2>
+        <p class="mb-0">Selamat datang, {{ Auth::user()->name }}! Pantau ringkasan kegiatan, lokasi, peserta, dan arsip Balai Bahasa Provinsi Riau.</p>
     </div>
 
     <!-- Stats Cards -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
-            <div class="stat-card">
+            <div class="stat-card dashboard-stat stat-blue">
+                <div class="stat-icon"><i class="bi bi-calendar-event"></i></div>
                 <h5>Total Kegiatan</h5>
                 <div class="number">{{ $totalKegiatan }}</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="stat-card">
+            <div class="stat-card dashboard-stat stat-green">
+                <div class="stat-icon"><i class="bi bi-geo-alt"></i></div>
                 <h5>Total Lokasi</h5>
                 <div class="number">{{ $totalLokasi }}</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="stat-card">
+            <div class="stat-card dashboard-stat stat-cyan">
+                <div class="stat-icon"><i class="bi bi-people"></i></div>
                 <h5>Total Peserta</h5>
                 <div class="number">{{ $totalPeserta }}</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="stat-card">
+            <div class="stat-card dashboard-stat stat-amber">
+                <div class="stat-icon"><i class="bi bi-file-earmark-text"></i></div>
                 <h5>Total Arsip</h5>
                 <div class="number">{{ $totalArsip }}</div>
             </div>
@@ -40,13 +145,15 @@
     <!-- Activity Stats -->
     <div class="row mb-4">
         <div class="col-md-6 mb-3">
-            <div class="stat-card">
+            <div class="stat-card dashboard-stat stat-red">
+                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
                 <h5>Kegiatan Tahun Ini</h5>
                 <div class="number text-primary">{{ $kegiatanTahunIni }}</div>
             </div>
         </div>
         <div class="col-md-6 mb-3">
-            <div class="stat-card">
+            <div class="stat-card dashboard-stat stat-violet">
+                <div class="stat-icon"><i class="bi bi-person-plus"></i></div>
                 <h5>Peserta Bulan Ini</h5>
                 <div class="number text-success">{{ $pesertaBulanIni }}</div>
             </div>
@@ -56,7 +163,7 @@
     <!-- Charts Section -->
     <div class="row mb-4">
         <div class="col-md-6 mb-3">
-            <div class="card">
+            <div class="card dashboard-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Kegiatan per Tahun</h5>
                 </div>
@@ -67,7 +174,7 @@
         </div>
 
         <div class="col-md-6 mb-3">
-            <div class="card">
+            <div class="card dashboard-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Kegiatan per Jenis</h5>
                 </div>
@@ -80,7 +187,7 @@
 
     <div class="row mb-4">
         <div class="col-md-6 mb-3">
-            <div class="card">
+            <div class="card dashboard-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Top 5 Lokasi by Kegiatan</h5>
                 </div>
@@ -91,7 +198,7 @@
         </div>
 
         <div class="col-md-6 mb-3">
-            <div class="card">
+            <div class="card dashboard-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-people"></i> Peserta per Kegiatan (Top 5)</h5>
                 </div>
@@ -105,13 +212,13 @@
     <!-- Recent Kegiatans -->
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card dashboard-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-clock-history"></i> Kegiatan Terbaru</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover dashboard-table">
                             <thead>
                                 <tr>
                                     <th>Nama Kegiatan</th>

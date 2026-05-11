@@ -4,18 +4,18 @@
 
 <div class="container-fluid">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="admin-page-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
             <h2><i class="bi bi-people"></i> Manajemen Peserta</h2>
-            <p class="text-muted">Total: {{ $peserta->total() }} peserta</p>
+            <p>Total: {{ $peserta->total() }} peserta</p>
         </div>
-        <a href="{{ route('admin.peserta.create') }}" class="btn btn-primary">
+        <a href="{{ route('admin.peserta.create') }}" class="btn btn-light text-primary">
             <i class="bi bi-plus-circle"></i> Tambah Peserta
         </a>
     </div>
 
     <!-- Table -->
-    <div class="card">
+    <div class="card admin-card-interactive">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
@@ -69,6 +69,7 @@
                             </small>
                         </td>
                         <td>
+                            <div class="admin-action-group">
                             <a href="{{ route('admin.peserta.edit', $p->id) }}" 
                                class="btn btn-sm btn-warning" title="Edit">
                                 <i class="bi bi-pencil"></i>
@@ -82,11 +83,13 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
+                        <td colspan="7" class="text-center admin-empty-state">
+                            <i class="bi bi-people"></i>
                             Belum ada data peserta
                         </td>
                     </tr>

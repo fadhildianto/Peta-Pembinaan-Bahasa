@@ -13,7 +13,7 @@ class PetaPublicController extends Controller
     {
         $infoBalai = [
             'nama' => 'Balai Bahasa Provinsi Riau',
-            'deskripsi' => 'Balai Bahasa Provinsi Riau adalah lembaga pemerintah yang bertugas melaksanakan pembinaan dan pengembangan bahasa, sastra, dan aksara Indonesia, serta melaksanakan pembinaan dan pengembangan bahasa-bahasa daerah.',
+            'deskripsi' => 'Balai Bahasa Provinsi Riau adalah lembaga pemerintah yang bertugas melaksanakan pembinaan dan pengembangan bahasa, sastra, Indonesia, serta melaksanakan pembinaan dan pengembangan bahasa-bahasa daerah.',
             'alamat' => 'Jl. HR. Soebrantas Panam No.Km. 12,5, Simpang Baru, Kec. Tuah Madani, Kota Pekanbaru, Riau 28292',
             'no_telp' => '(0761) 3223048',
             'email' => 'balaibahasariau@kemendikdasmen.go.id',
@@ -31,7 +31,7 @@ class PetaPublicController extends Controller
     public function show(Lokasi $lokasi)
     {
         $kegiatans = $lokasi->kegiatans()
-            ->with('arsip')
+            ->with(['peserta', 'arsip'])
             ->withCount(['peserta', 'arsip'])
             ->latest()
             ->get();

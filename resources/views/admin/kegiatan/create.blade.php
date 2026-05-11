@@ -3,9 +3,14 @@
 @section('content')
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-10">
-            <div class="card">
+    <div class="admin-page-hero">
+        <h2><i class="bi bi-plus-circle"></i> Tambah Kegiatan</h2>
+        <p>Lengkapi data kegiatan baru untuk dipakai pada peserta, arsip, dan peta kegiatan.</p>
+    </div>
+
+    <div class="row admin-create-layout g-4">
+        <div class="col-lg-8">
+            <div class="card admin-card-interactive admin-form-card admin-create-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Tambah Kegiatan Baru</h5>
                 </div>
@@ -104,7 +109,7 @@
                         </div>
 
                         <!-- Buttons -->
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 admin-create-actions">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-circle"></i> Simpan
                             </button>
@@ -113,6 +118,19 @@
                             </a>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card admin-card-interactive admin-create-side">
+                <div class="card-body">
+                    <div class="admin-create-icon"><i class="bi bi-calendar2-check"></i></div>
+                    <h5 class="mb-2">Kegiatan Baru</h5>
+                    <p class="text-muted mb-3">Data ini menjadi pusat relasi untuk peserta dan arsip.</p>
+                    <div class="admin-create-pill"><i class="bi bi-tags"></i> Jenis kegiatan</div>
+                    <div class="admin-create-pill"><i class="bi bi-geo-alt"></i> Lokasi pelaksanaan</div>
+                    <div class="admin-create-pill"><i class="bi bi-calendar-range"></i> Rentang tanggal</div>
                 </div>
             </div>
         </div>

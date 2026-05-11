@@ -5,7 +5,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card admin-card-interactive admin-form-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-pencil"></i> Edit Peserta</h5>
                 </div>
@@ -20,8 +20,11 @@
                             <select id="kegiatan_id" name="kegiatan_id" class="form-select @error('kegiatan_id') is-invalid @enderror">
                                 <option value="">-- Pilih Kegiatan --</option>
                                 @foreach($kegiatans as $kegiatan)
-                                    <option value="{{ $kegiatan->id }}" data-jenis="{{ $kegiatan->jenis_kegiatan }}" @if(old('kegiatan_id', $peserta->kegiatan_id) == $kegiatan->id) selected @endif>
-                                        {{ $kegiatan->nama_kegiatan }} ({{ $kegiatan->tahun }})
+                                    <option value="{{ $kegiatan->id }}" 
+                                        data-jenis="{{ $kegiatan->jenis_kegiatan }}"
+                                        data-lokasi="{{ $kegiatan->lokasi?->nama_kabupaten ?? 'N/A' }}"
+                                        @if(old('kegiatan_id', $peserta->kegiatan_id) == $kegiatan->id) selected @endif>
+                                        {{ $kegiatan->jenis_kegiatan }} - {{ $kegiatan->nama_kegiatan }} - {{ $kegiatan->lokasi?->nama_kabupaten ?? 'N/A' }} ({{ $kegiatan->tahun }})
                                     </option>
                                 @endforeach
                             </select>
@@ -121,9 +124,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const telpInput = document.querySelector('input[name="no_telp"]');
     const alamatInput = document.querySelector('textarea[name="alamat"]');
 
+    function normalizeJenisKegiatan(nilai) {
+        // Map old lowercase values to new proper case values
+        if (!nilai) return nilai;
+        
+        const normalized = nilai.toLowerCase().trim();
+        
+        if (normalized === 'penyuluhan') {
+            return 'Penyuluhan Bahasa';
+        } else if (normalized === 'pembinaan') {
+            return 'Pembinaan Lembaga';
+        }
+        
+        // Return as-is if already normalized or unknown
+        return nilai;
+    }
+
     function updateFormFields() {
         const selectedOption = kegiatanSelect.options[kegiatanSelect.selectedIndex];
-        const jenisKegiatan = selectedOption.getAttribute('data-jenis');
+        let jenisKegiatan = selectedOption.getAttribute('data-jenis');
+
+        // Normalize jenis kegiatan to handle any format
+        jenisKegiatan = normalizeJenisKegiatan(jenisKegiatan);
+        
+        console.log('Edit form - Jenis kegiatan:', jenisKegiatan);
 
         if (jenisKegiatan === 'Penyuluhan Bahasa') {
             // Penyuluhan Bahasa: Nama & Instansi wajib

@@ -4,18 +4,18 @@
 
 <div class="container-fluid">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="admin-page-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
             <h2><i class="bi bi-calendar-event"></i> Manajemen Kegiatan</h2>
-            <p class="text-muted">Total: {{ $kegiatan->total() }} kegiatan</p>
+            <p>Total: {{ $kegiatan->total() }} kegiatan</p>
         </div>
-        <a href="{{ route('admin.kegiatan.create') }}" class="btn btn-primary">
+        <a href="{{ route('admin.kegiatan.create') }}" class="btn btn-light text-primary">
             <i class="bi bi-plus-circle"></i> Tambah Kegiatan
         </a>
     </div>
 
     <!-- Filters -->
-    <div class="card mb-4">
+    <div class="card admin-card-interactive admin-toolbar-card mb-4">
         <div class="card-body">
             <form action="{{ route('admin.kegiatan.index') }}" method="GET" class="row g-3">
                 <div class="col-md-3">
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Table -->
-    <div class="card">
+    <div class="card admin-card-interactive">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
@@ -71,7 +71,7 @@
                             <strong>{{ $k->nama_kegiatan }}</strong>
                         </td>
                         <td>
-                            @if($k->jenis_kegiatan == 'penyuluhan')
+                            @if(in_array(strtolower($k->jenis_kegiatan), ['penyuluhan', 'penyuluhan bahasa']))
                                 <span class="badge bg-info">Penyuluhan</span>
                             @else
                                 <span class="badge bg-warning">Pembinaan</span>
@@ -91,6 +91,7 @@
                             </small>
                         </td>
                         <td>
+                            <div class="admin-action-group">
                             <a href="{{ route('admin.kegiatan.show', $k->id) }}" 
                                class="btn btn-sm btn-info" title="Detail">
                                 <i class="bi bi-eye"></i>
@@ -108,11 +109,13 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center text-muted py-4">
+                        <td colspan="9" class="text-center admin-empty-state">
+                            <i class="bi bi-calendar-x"></i>
                             Belum ada kegiatan
                         </td>
                     </tr>

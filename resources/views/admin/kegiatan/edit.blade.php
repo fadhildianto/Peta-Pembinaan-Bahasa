@@ -5,7 +5,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-10">
-            <div class="card">
+            <div class="card admin-card-interactive admin-form-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-pencil"></i> Edit Kegiatan</h5>
                 </div>
@@ -32,8 +32,8 @@
                                 <select name="jenis_kegiatan" 
                                         class="form-select @error('jenis_kegiatan') is-invalid @enderror">
                                     <option value="">-- Pilih Jenis --</option>
-                                    <option value="penyuluhan" @if($kegiatan->jenis_kegiatan == 'penyuluhan') selected @endif>Penyuluhan</option>
-                                    <option value="pembinaan" @if($kegiatan->jenis_kegiatan == 'pembinaan') selected @endif>Pembinaan</option>
+                                    <option value="penyuluhan" @if(in_array(strtolower($kegiatan->jenis_kegiatan), ['penyuluhan', 'penyuluhan bahasa'])) selected @endif>Penyuluhan</option>
+                                    <option value="pembinaan" @if(in_array(strtolower($kegiatan->jenis_kegiatan), ['pembinaan', 'pembinaan lembaga'])) selected @endif>Pembinaan</option>
                                 </select>
                                 @error('jenis_kegiatan')
                                     <div class="invalid-feedback">{{ $message }}</div>

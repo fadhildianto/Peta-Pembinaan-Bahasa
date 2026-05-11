@@ -4,18 +4,18 @@
 
 <div class="container-fluid">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="admin-page-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
             <h2><i class="bi bi-geo-alt"></i> Manajemen Lokasi</h2>
-            <p class="text-muted">Total: {{ $lokasis->count() }} lokasi</p>
+            <p>Total: {{ $lokasis->count() }} lokasi</p>
         </div>
-        <a href="{{ route('admin.lokasi.create') }}" class="btn btn-primary">
+        <a href="{{ route('admin.lokasi.create') }}" class="btn btn-light text-primary">
             <i class="bi bi-plus-circle"></i> Tambah Lokasi
         </a>
     </div>
 
     <!-- Table -->
-    <div class="card">
+    <div class="card admin-card-interactive">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
@@ -48,6 +48,7 @@
                             <small>{{ Str::limit($l->deskripsi, 40) ?? '-' }}</small>
                         </td>
                         <td>
+                            <div class="admin-action-group">
                             <a href="{{ route('admin.lokasi.edit', $l->id) }}" 
                                class="btn btn-sm btn-warning">
                                 <i class="bi bi-pencil"></i>
@@ -61,11 +62,13 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
+                        <td colspan="6" class="text-center admin-empty-state">
+                            <i class="bi bi-geo-alt"></i>
                             Belum ada lokasi
                         </td>
                     </tr>

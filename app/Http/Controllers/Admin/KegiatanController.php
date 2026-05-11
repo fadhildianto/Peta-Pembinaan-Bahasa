@@ -22,8 +22,17 @@ class KegiatanController extends Controller
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->where('nama_kegiatan', 'like', '%' . $request->string('search') . '%');
             })
-            ->when(in_array($jenis, ['penyuluhan', 'pembinaan'], true), function ($query) use ($jenis) {
-                $query->where('jenis_kegiatan', $jenis);
+            ->when($jenis, function ($query) use ($jenis) {
+                // Support both old lowercase and new proper case values
+                $values = [];
+                if (strtolower($jenis) === 'penyuluhan') {
+                    $values = ['Penyuluhan Bahasa', 'penyuluhan'];
+                } elseif (strtolower($jenis) === 'pembinaan') {
+                    $values = ['Pembinaan Lembaga', 'pembinaan'];
+                }
+                if (!empty($values)) {
+                    $query->whereIn('jenis_kegiatan', $values);
+                }
             })
             ->when(is_numeric($tahun), function ($query) use ($tahun) {
                 $query->where('tahun', (int) $tahun);

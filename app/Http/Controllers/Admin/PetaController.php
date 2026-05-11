@@ -7,6 +7,26 @@ use App\Models\Lokasi;
 
 class PetaController extends Controller
 {
+    private function isPenyuluhan(?string $jenis): bool
+    {
+        return in_array(strtolower(trim((string) $jenis)), ['penyuluhan', 'penyuluhan bahasa'], true);
+    }
+
+    private function isPembinaan(?string $jenis): bool
+    {
+        return in_array(strtolower(trim((string) $jenis)), ['pembinaan', 'pembinaan lembaga'], true);
+    }
+
+    private function jenisSlug(?string $jenis): string
+    {
+        return $this->isPembinaan($jenis) ? 'pembinaan' : 'penyuluhan';
+    }
+
+    private function jenisLabel(?string $jenis): string
+    {
+        return $this->isPembinaan($jenis) ? 'Pembinaan Lembaga' : 'Penyuluhan Bahasa';
+    }
+
     /**
      * Display the map view
      */
@@ -41,8 +61,12 @@ class PetaController extends Controller
             ->get()
             ->map(function ($lokasi) use ($detailRoute) {
                 // Hitung breakdown per jenis kegiatan
-                $penyuluhanCount = $lokasi->kegiatans->where('jenis_kegiatan', 'penyuluhan')->count();
-                $peminaanCount = $lokasi->kegiatans->where('jenis_kegiatan', 'pembinaan')->count();
+                $penyuluhanCount = $lokasi->kegiatans
+                    ->filter(fn ($kegiatan) => $this->isPenyuluhan($kegiatan->jenis_kegiatan))
+                    ->count();
+                $pembinaanCount = $lokasi->kegiatans
+                    ->filter(fn ($kegiatan) => $this->isPembinaan($kegiatan->jenis_kegiatan))
+                    ->count();
                 
                 return [
                     'id' => $lokasi->id,
@@ -53,7 +77,7 @@ class PetaController extends Controller
                     'zoom_level' => $lokasi->zoom_level,
                     'kegiatan_count' => $lokasi->kegiatans_count,
                     'kegiatan_penyuluhan' => $penyuluhanCount,
-                    'kegiatan_pembinaan' => $peminaanCount,
+                    'kegiatan_pembinaan' => $pembinaanCount,
                     'peserta_count' => $lokasi->kegiatans->sum('peserta_count'),
                     'arsip_count' => $lokasi->kegiatans->sum('arsip_count'),
                     'detail_url' => route($detailRoute, $lokasi),
@@ -71,10 +95,12 @@ class PetaController extends Controller
      */
     public function getMapDataPerType()
     {
-        $lokasis = Lokasi::with('kegiatans')
+        $lokasis = Lokasi::with([
+                'kegiatans' => fn ($query) => $query->withCount(['peserta', 'arsip']),
+            ])
             ->get()
             ->map(function ($lokasi) {
-                $kegiatans = $lokasi->kegiatans();
+                $kegiatans = $lokasi->kegiatans;
                 
                 return [
                     'id' => $lokasi->id,
@@ -85,19 +111,17 @@ class PetaController extends Controller
                     'zoom_level' => $lokasi->zoom_level,
                     
                     // Breakdown per jenis kegiatan
-                    'kegiatan_penyuluhan' => $kegiatans->where('jenis_kegiatan', 'penyuluhan')->count(),
-                    'kegiatan_pembinaan' => $kegiatans->where('jenis_kegiatan', 'pembinaan')->count(),
+                    'kegiatan_penyuluhan' => $kegiatans
+                        ->filter(fn ($kegiatan) => $this->isPenyuluhan($kegiatan->jenis_kegiatan))
+                        ->count(),
+                    'kegiatan_pembinaan' => $kegiatans
+                        ->filter(fn ($kegiatan) => $this->isPembinaan($kegiatan->jenis_kegiatan))
+                        ->count(),
                     'total_kegiatan' => $kegiatans->count(),
                     
                     // Total peserta dan arsip
-                    'peserta_count' => $kegiatans
-                        ->withCount('peserta')
-                        ->get()
-                        ->sum('peserta_count'),
-                    'arsip_count' => $kegiatans
-                        ->withCount('arsip')
-                        ->get()
-                        ->sum('arsip_count'),
+                    'peserta_count' => $kegiatans->sum('peserta_count'),
+                    'arsip_count' => $kegiatans->sum('arsip_count'),
                         
                     'detail_url' => route('peta.detail', $lokasi->id),
                 ];
@@ -117,12 +141,14 @@ class PetaController extends Controller
         $lokasi = Lokasi::findOrFail($lokasiId);
         $kegiatans = $lokasi->kegiatans()
             ->withCount(['peserta', 'arsip'])
+            ->latest()
             ->get()
             ->map(function ($kegiatan) {
                 return [
                     'id' => $kegiatan->id,
                     'nama' => $kegiatan->nama_kegiatan,
-                    'jenis' => $kegiatan->jenis_kegiatan,
+                    'jenis' => $this->jenisSlug($kegiatan->jenis_kegiatan),
+                    'jenis_label' => $this->jenisLabel($kegiatan->jenis_kegiatan),
                     'tahun' => $kegiatan->tahun,
                     'tanggal_mulai' => $kegiatan->tanggal_mulai?->format('d M Y'),
                     'tanggal_selesai' => $kegiatan->tanggal_selesai?->format('d M Y'),

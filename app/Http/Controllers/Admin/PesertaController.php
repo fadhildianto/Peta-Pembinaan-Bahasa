@@ -24,7 +24,8 @@ class PesertaController extends Controller
      */
     public function create()
     {
-        $kegiatans = Kegiatan::orderByDesc('tahun')
+        $kegiatans = Kegiatan::with('lokasi')
+            ->orderByDesc('tahun')
             ->orderBy('nama_kegiatan')
             ->get();
 
@@ -71,7 +72,8 @@ class PesertaController extends Controller
      */
     public function edit(Peserta $peserta)
     {
-        $kegiatans = Kegiatan::orderByDesc('tahun')
+        $kegiatans = Kegiatan::with('lokasi')
+            ->orderByDesc('tahun')
             ->orderBy('nama_kegiatan')
             ->get();
 

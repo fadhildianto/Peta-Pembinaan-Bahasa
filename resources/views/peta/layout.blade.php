@@ -106,40 +106,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark mb-4">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ route('peta.index') }}">
-                <i class="bi bi-map"></i> Balai Bahasa Prov. Riau
+                <i class="bi bi-map"></i> Balai Bahasa Provinsi Riau
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('peta.index') }}">
-                            <i class="bi bi-map"></i> Peta
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#tentang">
-                            <i class="bi bi-info-circle"></i> Tentang
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">
-                            <i class="bi bi-speedometer2"></i> Admin
-                        </a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </nav>
-
-    <!-- Hero Section -->
-    <div class="hero">
-        <div class="container-fluid">
-            <h1><i class="bi bi-map"></i> Peta Interaktif</h1>
-            <p>Balai Bahasa Provinsi Riau</p>
-        </div>
-    </div>
 
     <!-- Content -->
     <div class="container-fluid">
@@ -152,9 +122,9 @@
             <div class="row mb-4">
                 <div class="col-md-6 mb-3">
                     <h5>Balai Bahasa Provinsi Riau</h5>
-                    <p>Lembaga pemerintah yang bertugas melaksanakan pembinaan dan pengembangan bahasa, sastra, dan aksara Indonesia.</p>
+                    <p>Lembaga pemerintah yang bertugas melaksanakan pembinaan, pengembangan, dan perlindungan bahasa serta sastra indonesia</p>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 text-start">
                     <h5>Kontak</h5>
                     <p>
                         <i class="bi bi-telephone"></i> (0761) 3223048<br>

@@ -8,6 +8,7 @@ class Peserta extends Model
 {
     protected $fillable = [
         'kegiatan_id',
+        'lokasi_id',
         'nama',
         'instansi',
         'email',
@@ -21,5 +22,13 @@ class Peserta extends Model
     public function kegiatan()
     {
         return $this->belongsTo(Kegiatan::class);
+    }
+
+    /**
+     * Get the lokasi this peserta belongs to
+     */
+    public function lokasi()
+    {
+        return $this->belongsTo(Lokasi::class);
     }
 }
